@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="FlightRabbitMQ" xmlns="http://ws.apache.org/ns/synapse">
+  <rabbitmq.init>
+    <connectionType>RABBITMQ</connectionType>
+    <serverUrls>172.24.50.11:5672</serverUrls>
+    <saslMechanism>PLAIN</saslMechanism>
+    <oAuth2Enabled>false</oAuth2Enabled>
+    <username>guest</username>
+    <password>guest</password>
+    <sslEnabled>false</sslEnabled>
+    <connectionRecoveryPolicyType>FIXED_WITH_INITIAL_DELAY_AND_TIMEOUT</connectionRecoveryPolicyType>
+    <name>FlightRabbitMQ</name>
+  </rabbitmq.init>
+</localEntry>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api name="FlightAPI" context="/travel" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" uri-template="/flights/search">
+        <inSequence>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Flight search request received</message>
+            </log>
+            <http.post configKey="FlightSearchConn">
+                <relativePath>/flights/search</relativePath>
+                <headers>[]</headers>
+                <requestBodyType>JSON</requestBodyType>
+                <requestBodyJson>${payload}</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <forcePostPutNobody>false</forcePostPutNobody>
+                <responseVariable>FlightSearchResponse</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </http.post>
+            <respond />
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+    <resource methods="POST" uri-template="/flights/book">
+        <inSequence>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Flight booking request received</message>
+            </log>
+            <variable name="flightId" type="STRING" expression="${payload.flightId}" />
+            <variable name="tripType" type="STRING" expression="${payload.tripType}" />
+            <variable name="cabinClass" type="STRING" expression="${payload.cabinClass}" />
+            <variable name="passengers" type="STRING" expression="${payload.passengers}" />
+
+            <variable name="firstName" type="STRING" expression="${payload.passenger.FirstName}" />
+            <variable name="lastName" type="STRING" expression="${payload.passenger.LastName}" />
+            <variable name="email" type="STRING" expression="${payload.passenger.email}" />
+            <http.get configKey="FlightDetailsConn">
+                <relativePath>/flights/${vars.flightId}</relativePath>
+                <headers>[]</headers>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <responseVariable>FlightDetailsResponse</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </http.get>
+            <variable name="airline" type="STRING" expression="${payload.airline}" />
+            <variable name="flightNumber" type="STRING" expression="${payload.flightNumber}" />
+            <variable name="flightFrom" type="STRING" expression="${payload.from}" />
+            <variable name="flightTo" type="STRING" expression="${payload.to}" />
+            <variable name="departure" type="STRING" expression="${payload.departure}" />
+            <variable name="arrival" type="STRING" expression="${payload.arrival}" />
+            <variable name="duration" type="STRING" expression="${payload.duration}" />
+            <variable name="stops" type="STRING" expression="${payload.stops}" />
+            <http.post configKey="FlightReservationConn">
+                <relativePath>/flights/reserve</relativePath>
+                <headers>[]</headers>
+                <requestBodyType>JSON</requestBodyType>
+                <requestBodyJson>'{"flightId": "${vars.flightId}"}'</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <forcePostPutNobody>false</forcePostPutNobody>
+                <responseVariable>ReservationResponse</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </http.post>
+
+            <variable name="bookingId" type="STRING" expression="${payload.bookingId}" />
+            <http.post configKey="FlightFareConn">
+                <relativePath>/flights/fare</relativePath>
+                <headers>[]</headers>
+                <requestBodyType>JSON</requestBodyType>
+                <requestBodyJson>'{
+    "bookingId": "${vars.bookingId}",
+    "flightId": "${vars.flightId}",
+    "tripType": "${vars.tripType}",
+    "cabinClass": "${vars.cabinClass}",
+    "passengers": "${vars.passengers}"
+}'</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <forcePostPutNobody>false</forcePostPutNobody>
+                <responseVariable>FareResponse</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </http.post>
+
+
+            <variable name="totalFare" type="STRING" expression="${payload.totalFare}" />
+            <variable name="currency" type="STRING" expression="${payload.currency}" />
+            <http.post configKey="FlightPaymentConn">
+                <relativePath>/flights/payment</relativePath>
+                <headers>[]</headers>
+                <requestBodyType>JSON</requestBodyType>
+                <requestBodyJson>'{
+        "bookingId": "${vars.bookingId}",
+        "amount": "${vars.totalFare}",
+        "currency": "${vars.currency}"
+    }'</requestBodyJson>
+                <forceScAccepted>false</forceScAccepted>
+                <disableChunking>false</disableChunking>
+                <forceHttp10>false</forceHttp10>
+                <noKeepAlive>false</noKeepAlive>
+                <forcePostPutNobody>false</forcePostPutNobody>
+                <responseVariable>PaymentResponse</responseVariable>
+                <overwriteBody>true</overwriteBody>
+            </http.post>
+            <variable name="transactionId" type="STRING" expression="${payload.transactionId}" />
+            <variable name="paymentStatus" type="STRING" expression="${payload.status}" />
+            <payloadFactory media-type="json" template-type="default">
+
+                <format>{
+                    "boardingPass": { "bookingId": "${vars.bookingId}", "status":
+                    "${vars.paymentStatus}", "passenger": { "firstName": "${vars.firstName}",
+                    "lastName": "${vars.lastName}", "email": "${vars.email}" }, "flight": {
+                    "flightId": "${vars.flightId}", "airline": "${vars.airline}", "flightNumber":
+                    "${vars.flightNumber}", "from": "${vars.flightFrom}", "to": "${vars.flightTo}",
+                    "departure": "${vars.departure}", "arrival": "${vars.arrival}", "duration":
+                    "${vars.duration}", "stops": "${vars.stops}" }, "fare": { "amount":
+                    "${vars.totalFare}", "currency": "${vars.currency}" }, "payment": {
+                    "transactionId": "${vars.transactionId}", "status": "${vars.paymentStatus}" } }
+                    }</format>
+            </payloadFactory>
+            <rabbitmq.publishMessage configKey="FlightRabbitMQ">
+                <headers>[]</headers>
+                <requestBodyType>JSON</requestBodyType>
+                <requestBodyJson>${payload}</requestBodyJson>
+                <requestCharSet></requestCharSet>
+                <queue>flight.notifications</queue>
+                <queueAutoDeclare>true</queueAutoDeclare>
+                <queueType>QUORUM</queueType>
+                <queueArguments></queueArguments>
+                <deliveryLimit></deliveryLimit>
+                <deadLetterStrategy></deadLetterStrategy>
+                <queueAutoDelete>false</queueAutoDelete>
+                <queueOverflowStrategy>DROP_HEAD</queueOverflowStrategy>
+                <exchange></exchange>
+                <exchangeAutoDeclare>true</exchangeAutoDeclare>
+                <exchangeType>DIRECT</exchangeType>
+                <routingKey>flight.notifications</routingKey>
+                <exchangeArguments></exchangeArguments>
+                <exchangeAutoDelete>false</exchangeAutoDelete>
+                <publishTimeout>60000</publishTimeout>
+                <publisherConfirms>true</publisherConfirms>
+                <responseVariable>rabbitmq_publishMessage_1</responseVariable>
+                <overwriteBody>false</overwriteBody>
+            </rabbitmq.publishMessage>
+            <respond />
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+    <resource methods="GET" uri-template="/db-test">
+        <inSequence>
+            <log category="INFO" logMessageID="false" logFullPayload="false">
+                <message>Db test started</message>
+            </log>
+            <dblookup>
+                <connection>
+                    <pool>
+                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                        <user>root</user>
+                        <password>root123</password>
+                        <property name="validationquery" value="" />
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[SELECT available_seats FROM flights WHERE flight_id = ?]]></sql>
+                    <parameter value="FL001" type="VARCHAR" />
+                    <result column="available_seats" name="availableSeats" />
+                </statement>
+            </dblookup>
+            <respond />
+        </inSequence>
+        <faultSequence>
+        </faultSequence>
+    </resource>
+</api>

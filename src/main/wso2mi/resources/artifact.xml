@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifacts>
+  <artifact name="resources_datamapper_BoardingPass_BoardingPass_dmc" groupId="com.microintegrator.projects" version="1.0.0" type="registry/resource" serverRole="EnterpriseIntegrator">
+    <item>
+      <file>BoardingPass.dmc</file>
+      <path>/_system/governance/mi-resources/datamapper/BoardingPass</path>
+      <mediaType>text/plain</mediaType>
+      <properties></properties>
+    </item>
+  </artifact>
+  <artifact name="resources_datamapper_BoardingPass_BoardingPass_inputSchema_json" groupId="com.microintegrator.projects" version="1.0.0" type="registry/resource" serverRole="EnterpriseIntegrator">
+    <item>
+      <file>BoardingPass_inputSchema.json</file>
+      <path>/_system/governance/mi-resources/datamapper/BoardingPass</path>
+      <mediaType>text/plain</mediaType>
+      <properties></properties>
+    </item>
+  </artifact>
+  <artifact name="resources_datamapper_BoardingPass_BoardingPass_outputSchema_json" groupId="com.microintegrator.projects" version="1.0.0" type="registry/resource" serverRole="EnterpriseIntegrator">
+    <item>
+      <file>BoardingPass_outputSchema.json</file>
+      <path>/_system/governance/mi-resources/datamapper/BoardingPass</path>
+      <mediaType>text/plain</mediaType>
+      <properties/>
+    </item>
+  </artifact>
+</artifacts>

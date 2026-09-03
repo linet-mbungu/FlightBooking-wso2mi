@@ -1,0 +1,54 @@
+openapi: 3.0.1
+info:
+  title: FlightAPI
+  description: API Definition of FlightAPI
+  version: 1.0.0
+servers:
+  - url: http://localhost:8290/travel
+  - url: https://localhost:8253/travel
+paths:
+  /flights/search:
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response
+  /flights/book:
+    post:
+      requestBody:
+        description: Sample Payload
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: object
+          application/xml:
+            schema:
+              type: object
+              xml:
+                name: payload
+        required: false
+      responses:
+        default:
+          description: Default response
+  /db-test:
+    get:
+      responses:
+        default:
+          description: Default response
