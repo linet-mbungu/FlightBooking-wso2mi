@@ -47,8 +47,16 @@ paths:
       responses:
         default:
           description: Default response
-  /db-test:
+  /db-test/{flightId}:
     get:
+      parameters:
+        - name: flightId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
         default:
           description: Default response

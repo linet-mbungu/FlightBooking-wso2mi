@@ -2,7 +2,7 @@
 <localEntry key="FlightFareConn" xmlns="http://ws.apache.org/ns/synapse">
   <http.init>
     <connectionType>HTTP</connectionType>
-    <baseUrl>http://localhost:9500</baseUrl>
+    <baseUrl>http://localhost:9510</baseUrl>
     <authType>None</authType>
     <timeoutDuration/>
     <timeoutAction>Never</timeoutAction>

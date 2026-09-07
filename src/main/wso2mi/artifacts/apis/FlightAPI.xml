@@ -5,19 +5,131 @@
             <log category="INFO" logMessageID="false" logFullPayload="false">
                 <message>Flight search request received</message>
             </log>
-            <http.post configKey="FlightSearchConn">
-                <relativePath>/flights/search</relativePath>
-                <headers>[]</headers>
-                <requestBodyType>JSON</requestBodyType>
-                <requestBodyJson>${payload}</requestBodyJson>
-                <forceScAccepted>false</forceScAccepted>
-                <disableChunking>false</disableChunking>
-                <forceHttp10>false</forceHttp10>
-                <noKeepAlive>false</noKeepAlive>
-                <forcePostPutNobody>false</forcePostPutNobody>
-                <responseVariable>FlightSearchResponse</responseVariable>
-                <overwriteBody>true</overwriteBody>
-            </http.post>
+            <property name="origin" expression="${payload.origin}" />
+            <property name="destination" expression="${payload.destination}" />
+            <dblookup>
+                <connection>
+                    <pool>
+                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                        <user>root</user>
+                        <password>root123</password>
+                    </pool>
+                </connection>
+                <statement>
+                    <sql><![CDATA[SELECT flight_id, flight_number, departure_date, departure_time, arrival_time, available_seats FROM flights WHERE origin = ? AND destination = ?]]></sql>
+                    <parameter expression="$ctx:origin" type="VARCHAR" />
+                    <parameter expression="$ctx:destination" type="VARCHAR" />
+                    <result column="flight_id" name="flightId" />
+                    <result column="flight_number" name="flightNumber" />
+                    <result column="departure_date" name="departureDate" />
+                    <result column="departure_time" name="departureTime" />
+                    <result column="arrival_time" name="arrivalTime" />
+                    <result column="available_seats" name="availableSeats" />
+                </statement>
+            </dblookup>
+            <filter xpath="boolean($ctx:flightId)">
+                <then>
+                    <dblookup>
+                        <connection>
+                            <pool>
+                                <driver>com.mysql.cj.jdbc.Driver</driver>
+                                <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                                <user>root</user>
+                                <password>root123</password>
+                            </pool>
+                        </connection>
+                        <statement>
+                            <sql><![CDATA[SELECT price FROM fares WHERE flight_id = ? AND cabin_class = 'Economy' AND trip_type = 'ONE_WAY']]></sql>
+                            <parameter expression="$ctx:flightId" type="VARCHAR" />
+                            <result column="price" name="economyOneWay" />
+                        </statement>
+                    </dblookup>
+                    <dblookup>
+                        <connection>
+                            <pool>
+                                <driver>com.mysql.cj.jdbc.Driver</driver>
+                                <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                                <user>root</user>
+                                <password>root123</password>
+                            </pool>
+                        </connection>
+                        <statement>
+                            <sql><![CDATA[SELECT price FROM fares WHERE flight_id = ? AND cabin_class = 'Business' AND trip_type = 'ONE_WAY']]></sql>
+                            <parameter expression="$ctx:flightId" type="VARCHAR" />
+                            <result column="price" name="businessOneWay" />
+                        </statement>
+                    </dblookup>
+                    <dblookup>
+                        <connection>
+                            <pool>
+                                <driver>com.mysql.cj.jdbc.Driver</driver>
+                                <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                                <user>root</user>
+                                <password>root123</password>
+                            </pool>
+                        </connection>
+                        <statement>
+                            <sql><![CDATA[SELECT price FROM fares WHERE flight_id = ? AND cabin_class = 'Economy' AND trip_type = 'ROUND_TRIP']]></sql>
+                            <parameter expression="$ctx:flightId" type="VARCHAR" />
+                            <result column="price" name="economyRoundTrip" />
+                        </statement>
+                    </dblookup>
+                    <dblookup>
+                        <connection>
+                            <pool>
+                                <driver>com.mysql.cj.jdbc.Driver</driver>
+                                <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
+                                <user>root</user>
+                                <password>root123</password>
+                            </pool>
+                        </connection>
+                        <statement>
+                            <sql><![CDATA[SELECT price FROM fares WHERE flight_id = ? AND cabin_class = 'Business' AND trip_type = 'ROUND_TRIP']]></sql>
+                            <parameter expression="$ctx:flightId" type="VARCHAR" />
+                            <result column="price" name="businessRoundTrip" />
+                        </statement>
+                    </dblookup>
+                    <payloadFactory media-type="json">
+                        <format>{
+                            "flightId": "$1",
+                            "airline": "Kenya Airways",
+                            "flightNumber": "$2",
+                            "from": "$3",
+                            "to": "$4",
+                            "departureDate": "$5",
+                            "departureTime": "$6",
+                            "arrivalTime": "$7",
+                            "availableSeats": "$8",
+                            "currency": "KES",
+                            "fares": {
+                                "economy": { "oneWay": $9, "roundTrip": $10 },
+                                "business": { "oneWay": $11, "roundTrip": $12 }
+                            }
+                        }</format>
+                        <args>
+                            <arg expression="$ctx:flightId"/>
+                            <arg expression="$ctx:flightNumber"/>
+                            <arg expression="$ctx:origin"/>
+                            <arg expression="$ctx:destination"/>
+                            <arg expression="$ctx:departureDate"/>
+                            <arg expression="$ctx:departureTime"/>
+                            <arg expression="$ctx:arrivalTime"/>
+                            <arg expression="$ctx:availableSeats"/>
+                            <arg expression="$ctx:economyOneWay"/>
+                            <arg expression="$ctx:economyRoundTrip"/>
+                            <arg expression="$ctx:businessOneWay"/>
+                            <arg expression="$ctx:businessRoundTrip"/>
+                        </args>
+                    </payloadFactory>
+                </then>
+                <else>
+                    <payloadFactory media-type="json">
+                        <format>{ "error": "No flight found for the given route" }</format>
+                        <args></args>
+                    </payloadFactory>
+                </else>
+            </filter>
             <respond />
         </inSequence>
         <faultSequence>
@@ -58,7 +170,12 @@
                 <relativePath>/flights/reserve</relativePath>
                 <headers>[]</headers>
                 <requestBodyType>JSON</requestBodyType>
-                <requestBodyJson>'{"flightId": "${vars.flightId}"}'</requestBodyJson>
+                <requestBodyJson>'{
+        "flightId": "${vars.flightId}",
+        "tripType": "${vars.tripType}",
+        "cabinClass": "${vars.cabinClass}",
+        "passengers": "${vars.passengers}"
+    }'</requestBodyJson>
                 <forceScAccepted>false</forceScAccepted>
                 <disableChunking>false</disableChunking>
                 <forceHttp10>false</forceHttp10>
@@ -154,7 +271,7 @@
         <faultSequence>
         </faultSequence>
     </resource>
-    <resource methods="GET" uri-template="/db-test">
+    <resource methods="GET" uri-template="/db-test/{flightId}">
         <inSequence>
             <log category="INFO" logMessageID="false" logFullPayload="false">
                 <message>Db test started</message>
@@ -171,10 +288,32 @@
                 </connection>
                 <statement>
                     <sql><![CDATA[SELECT available_seats FROM flights WHERE flight_id = ?]]></sql>
-                    <parameter value="FL001" type="VARCHAR" />
+                    <parameter expression="$ctx:uri.var.flightId" type="VARCHAR" />
                     <result column="available_seats" name="availableSeats" />
                 </statement>
             </dblookup>
+            <filter xpath="boolean($ctx:availableSeats)">
+                <then>
+                    <payloadFactory media-type="json">
+                        <format>{ "flightId": "$1", "availableSeats": "$2" }</format>
+                        <args>
+                            <arg expression="$ctx:uri.var.flightId"/>
+                            <arg expression="$ctx:availableSeats"/>
+                        </args>
+                    </payloadFactory>
+                </then>
+                <else>
+                    <payloadFactory media-type="json">
+                        <format>{ "error": "Flight not found", "flightId": "$1" }</format>
+                        <args>
+                            <arg expression="$ctx:uri.var.flightId"/>
+                        </args>
+                    </payloadFactory>
+                </else>
+            </filter>
+            <log level="full">
+                <message>Db test completed</message>
+            </log>
             <respond />
         </inSequence>
         <faultSequence>
