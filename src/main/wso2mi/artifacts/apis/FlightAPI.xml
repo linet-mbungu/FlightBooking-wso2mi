@@ -280,9 +280,9 @@
                 <connection>
                     <pool>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://127.0.0.1:3306/flight_booking</url>
-                        <user>root</user>
-                        <password>root123</password>
+                        <url>${configs.db.url}</url>
+                        <user>${configs.db.user}</user>
+                        <password>${configs.db.password}</password>
                         <property name="validationquery" value="" />
                     </pool>
                 </connection>
