@@ -11,9 +11,9 @@
                 <connection>
                     <pool>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>${configs.db.url}</url>
-                        <user>${configs.db.user}</user>
-                        <password>${configs.db.password}</password>
+                        <url>${configs.db_url}</url>
+                        <user>${configs.db_user}</user>
+                        <password>${configs.db_password}</password>
                     </pool>
                 </connection>
                 <statement>
@@ -34,9 +34,9 @@
                         <connection>
                             <pool>
                                 <driver>com.mysql.cj.jdbc.Driver</driver>
-                                <url>${configs.db.url}</url>
-                                <user>${configs.db.user}</user>
-                                <password>${configs.db.password}</password>
+                                <url>${configs.db_url}</url>
+                                <user>${configs.db_user}</user>
+                                <password>${configs.db_password}</password>
                             </pool>
                         </connection>
                         <statement>
@@ -49,9 +49,9 @@
                         <connection>
                             <pool>
                                 <driver>com.mysql.cj.jdbc.Driver</driver>
-                                <url>${configs.db.url}</url>
-                                <user>${configs.db.user}</user>
-                                <password>${configs.db.password}</password>
+                                <url>${configs.db_url}</url>
+                                <user>${configs.db_user}</user>
+                                <password>${configs.db_password}</password>
                             </pool>
                         </connection>
                         <statement>
@@ -64,9 +64,9 @@
                         <connection>
                             <pool>
                                 <driver>com.mysql.cj.jdbc.Driver</driver>
-                                <url>${configs.db.url}</url>
-                                <user>${configs.db.user}</user>
-                                <password>${configs.db.password}</password>
+                                <url>${configs.db_url}</url>
+                                <user>${configs.db_user}</user>
+                                <password>${configs.db_password}</password>
                             </pool>
                         </connection>
                         <statement>
@@ -79,9 +79,9 @@
                         <connection>
                             <pool>
                                 <driver>com.mysql.cj.jdbc.Driver</driver>
-                                <url>${configs.db.url}</url>
-                                <user>${configs.db.user}</user>
-                                <password>${configs.db.password}</password>
+                                <url>${configs.db_url}</url>
+                                <user>${configs.db_user}</user>
+                                <password>${configs.db_password}</password>
                             </pool>
                         </connection>
                         <statement>
@@ -280,9 +280,9 @@
                 <connection>
                     <pool>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>${configs.db.url}</url>
-                        <user>${configs.db.user}</user>
-                        <password>${configs.db.password}</password>
+                        <url>${configs.db_url}</url>
+                        <user>${configs.db_user}</user>
+                        <password>${configs.db_password}</password>
                         <property name="validationquery" value="" />
                     </pool>
                 </connection>
